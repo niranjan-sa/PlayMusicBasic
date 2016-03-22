@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Various attibutes shown below are added the last one hides the icons
+        if you set it's value to never it will only show the overflow area
+    -->
+    <item
+
+        android:id="@+id/search_id"
+        android:title="info"
+        android:icon="@mipmap/end"
+        app:showAsAction="always"></item>
+    <!-- showAsAction = "never" than outflow will be done
+                      = "always" than list will be shown -->
+
+    <item
+
+        android:id="@+id/settings_id"
+        android:title="info"
+        android:icon="@mipmap/rand"
+        app:showAsAction="always"></item>
+
+</menu>
