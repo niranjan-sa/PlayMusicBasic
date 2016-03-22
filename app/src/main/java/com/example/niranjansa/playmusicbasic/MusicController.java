@@ -10,6 +10,6 @@ public class MusicController extends android.widget.MediaController {
     public MusicController(Context c) {
         super(c);
     }
-
+    //This is us
     public void hide(){}
 }
