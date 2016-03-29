@@ -213,6 +213,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         }
 
         //Quering the internal memory
+        //Changed my git username
 
         musicUri=MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         musicCursor = musicResolver.query(musicUri, null, null, null, null);
