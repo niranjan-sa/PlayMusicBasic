@@ -3,13 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.niranjansa.playmusicbasic.MainActivity">
 
-    <item
-        android:id="@+id/action_shuffle"
-        android:icon="@mipmap/rand"
-        android:orderInCategory="100"
-        android:title="shuffle"
-        app:showAsAction="always"
-        />
+
 
     <item
         android:id="@+id/action_end"
@@ -17,4 +11,9 @@
         android:orderInCategory="2"
         app:showAsAction="always"
         android:title="End"/>
+
+    <!--
+        Removed the second button
+
+    -->
 </menu>

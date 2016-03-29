@@ -2,12 +2,14 @@ package com.example.niranjansa.playmusicbasic;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
@@ -27,6 +29,7 @@ import android.net.Uri;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.widget.ListView;
+import android.widget.Toast;
 
 
 public class MainActivity extends Activity implements MediaPlayerControl {
@@ -47,20 +50,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
-
 
         //Here I go
 
@@ -81,14 +70,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         songView.setAdapter(songAdt);
         setController();
 
-        /*Adding an Action bar
-        android.support.v7.app.ActionBar ab=getSupportActionBar();
-        ab.setLogo(R.mipmap.play);
-        ab.setDisplayUseLogoEnabled(true);//Enables logo
-        ab.setDisplayShowHomeEnabled(true);//Enables home
-        /*
-        ActionBar ab=getActionBar();
-        ab.setLogo(R.mipmap.ic_launcher);*/
 
     }
 
@@ -137,10 +118,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         //menu item selected
 
         switch (item.getItemId()) {
-            case R.id.action_shuffle:
-                //shuffle
-                musicSrv.setShuffle();
-                break;
+
             case R.id.action_end:
                 stopService(playIntent);
                 musicSrv=null;
@@ -189,30 +167,94 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 
     public void getSongList() {
         //retrieve song info
-        ContentResolver musicResolver = getContentResolver();
-        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Uri musicUri_int= MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
 
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+        /*
+        * Getting the songs from the external storage
+        *
+        * */
+
+        boolean isSdPresent=android.os.Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+
+        //Common variables
+        ContentResolver musicResolver;
+        Uri musicUri;
+        Cursor musicCursor;
+        int songs=0;
+        musicResolver = getContentResolver();
 
 
+        //Checking sd card presence
+        if(isSdPresent) {
+
+            //Uri for the internal storage
+            musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            //Cursor for ext storage
+            musicCursor = musicResolver.query(musicUri, null, null, null, null);
+
+
+            if(musicCursor!=null && musicCursor.moveToFirst()){
+                //get columns
+                int titleColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.TITLE);
+                int idColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media._ID);
+                int artistColumn = musicCursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.ARTIST);
+                //add songs to list
+                do {
+                    long thisId = musicCursor.getLong(idColumn);
+                    String thisTitle = musicCursor.getString(titleColumn);
+                    String thisArtist = musicCursor.getString(artistColumn);
+                    songList.add(new Song(thisId, thisTitle, thisArtist));
+                    songs++;
+                }
+                while (musicCursor.moveToNext());
+            }
+        }
+
+        //Quering the internal memory
+
+        musicUri=MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+        musicCursor = musicResolver.query(musicUri, null, null, null, null);
+        int i=0;
+        final String THU="hermit";
         if(musicCursor!=null && musicCursor.moveToFirst()){
             //get columns
+            Log.i(THU, "I came here");
             int titleColumn = musicCursor.getColumnIndex
                     (android.provider.MediaStore.Audio.Media.TITLE);
             int idColumn = musicCursor.getColumnIndex
                     (android.provider.MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex
-                    (android.provider.MediaStore.Audio.Media.ARTIST);
-            //add songs to list
+                    (MediaStore.Audio.Media.ARTIST);
+
+            //retriving the flags to avoid showing the ring tones and other system files
+            int isAlarm=musicCursor.getColumnIndex(MediaStore.Audio.Media.IS_ALARM);
+            int isRingtone=musicCursor.getColumnIndex(MediaStore.Audio.Media.IS_RINGTONE);
+            int isPodcast=musicCursor.getColumnIndex(MediaStore.Audio.Media.IS_PODCAST);
+            int isNotification=musicCursor.getColumnIndex(MediaStore.Audio.Media.IS_NOTIFICATION);
+
+            //add songs to list from the internal memory
             do {
                 long thisId = musicCursor.getLong(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
-                songList.add(new Song(thisId, thisTitle, thisArtist));
+                if((musicCursor.getInt(isAlarm) | musicCursor.getInt(isRingtone) | musicCursor.getInt(isPodcast) | musicCursor.getInt(isNotification))==0) {
+                    songList.add(new Song(thisId, thisTitle, thisArtist));
+                    songs++;
+                    i++;
+                }
             }
             while (musicCursor.moveToNext());
         }
+
+        Toast.makeText(this, "Total songs queried :- "+songs+" Int - " +i+" Ext :- "+(songs-i),Toast.LENGTH_LONG).show();
+
+
+        if(i==0) {
+            Toast.makeText(this, "No songs present on the device :- ",Toast.LENGTH_LONG).show();
+        }
+
     }
 
 
@@ -326,5 +368,4 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         }
         controller.show(0);
     }
-
 }
