@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //hiiii
         //Here I go
 
         songView = (ListView)findViewById(R.id.song_list);
@@ -102,6 +102,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     }
 
     public void songPicked(View view){
+
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
         if(playbackPaused){
@@ -228,22 +229,25 @@ public class MainActivity extends Activity implements MediaPlayerControl {
                     (android.provider.MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex
                     (MediaStore.Audio.Media.ARTIST);
+            int dataColumn=musicCursor.getColumnIndex
+                    (MediaStore.Audio.Media.DATA);
 
             //retriving the flags to avoid showing the ring tones and other system files
-            int isAlarm=musicCursor.getColumnIndex(MediaStore.Audio.Media.IS_ALARM);
-            int isRingtone=musicCursor.getColumnIndex(MediaStore.Audio.Media.IS_RINGTONE);
-            int isPodcast=musicCursor.getColumnIndex(MediaStore.Audio.Media.IS_PODCAST);
-            int isNotification=musicCursor.getColumnIndex(MediaStore.Audio.Media.IS_NOTIFICATION);
+
 
             //add songs to list from the internal memory
             do {
-                long thisId = musicCursor.getLong(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                if((musicCursor.getInt(isAlarm) | musicCursor.getInt(isRingtone) | musicCursor.getInt(isPodcast) | musicCursor.getInt(isNotification))==0) {
+                String path=musicCursor.getString(dataColumn);
+                if(path.endsWith("mp3")) {
+                    long thisId = musicCursor.getLong(idColumn);
+
+                    String thisTitle = musicCursor.getString(titleColumn);
+                    String thisArtist = musicCursor.getString(artistColumn);
+
                     songList.add(new Song(thisId, thisTitle, thisArtist));
                     songs++;
                     i++;
+
                 }
             }
             while (musicCursor.moveToNext());
