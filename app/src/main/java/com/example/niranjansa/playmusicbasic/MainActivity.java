@@ -211,7 +211,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
                 }
                 while (musicCursor.moveToNext());
             }
-        }
+      }
 
         //Quering the internal memory
         //Changed my git username
@@ -310,7 +310,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         if(musicSrv!=null && musicBound && musicSrv.isPng())
         return musicSrv.getPosn();
         else return 0;
-
     }
 
     @Override

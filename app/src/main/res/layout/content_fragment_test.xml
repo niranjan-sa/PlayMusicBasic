@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1">
+
+    <ImageButton
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:radius="100dp"
+        android:background="@drawable/button_shape"
+        android:src="@mipmap/ic_play_one"
+        android:id="@+id/play"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:radius="70dp"
+        android:background="@drawable/button_shape"
+        android:src="@mipmap/ic_fast_forward"
+        android:id="@+id/fast_forward"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/play"
+        android:layout_toEndOf="@+id/play"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp" />
+
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:radius="70dp"
+        android:background="@drawable/button_shape"
+        android:src="@mipmap/ic_fast_rewind"
+        android:id="@+id/fast_rewind"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/play"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp" />
+
+</RelativeLayout>
