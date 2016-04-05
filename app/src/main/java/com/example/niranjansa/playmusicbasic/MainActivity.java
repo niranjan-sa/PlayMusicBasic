@@ -233,7 +233,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
                     (MediaStore.Audio.Media.DATA);
 
             //retriving the flags to avoid showing the ring tones and other system files
-
+            //NSA on the master
 
             //add songs to list from the internal memory
             do {
