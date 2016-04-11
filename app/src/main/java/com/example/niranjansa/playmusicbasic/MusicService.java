@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import android.content.ContentUris;
 import android.media.AudioManager;
@@ -26,6 +28,9 @@ public class MusicService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener{
 
+
+
+    private static Thread postionUpdater;
     //media player
     private MediaPlayer player;
     //song list
@@ -52,7 +57,51 @@ public class MusicService extends Service implements
         player = new MediaPlayer();
         initMusicPlayer();
         rand=new Random();
+
     }
+
+    public void createThread() {
+        //Defining the thread
+
+        if(postionUpdater!=null)
+        {
+            postionUpdater.interrupt();
+            postionUpdater=null;
+        }
+        postionUpdater=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(player!=null)
+                    duration=getDur();
+                while (!Thread.currentThread().isInterrupted()) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    updatePosition();
+                }
+            }
+
+            public synchronized void updatePosition() {
+                if(player!=null)
+                    position=getPosn();
+            }
+        });
+    }
+
+
+    public void startThread() {
+        if(postionUpdater!=null)
+            postionUpdater.start();
+    }
+
+    public void stopThread() {
+        if(postionUpdater!=null)
+            postionUpdater.stop();
+    }
+
+
 
     public void initMusicPlayer(){
         //set player properties
@@ -94,6 +143,8 @@ public class MusicService extends Service implements
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
         player.prepareAsync();
+        createThread();
+        startThread();
     }
     //User to set song
     public void setSong(int songIndex){
@@ -136,6 +187,8 @@ public class MusicService extends Service implements
     @Override
     public void onPrepared(MediaPlayer mp) {
         mp.start();
+
+        //Setting the notification in the notification bar
         Intent notIntent = new Intent(this, MainActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
@@ -152,12 +205,21 @@ public class MusicService extends Service implements
         Notification not = builder.build();
 
         startForeground(NOTIFY_ID, not);
+
+
     }
 
 
     /*These are the methods related to the media controller class*/
 
-    public int getPosn(){
+    /*Controller variables declaration*/
+    public static volatile long duration=0;
+    public static volatile long position=0;
+
+    /**/
+
+
+    public long getPosn(){
         return player.getCurrentPosition();
     }
 
@@ -180,6 +242,8 @@ public class MusicService extends Service implements
     public void go(){
         player.start();
     }
+
+    public String foo() {return "Halo";}
 
     /*Controller class methods end here*/
 

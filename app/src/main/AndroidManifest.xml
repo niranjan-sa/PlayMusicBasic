@@ -3,6 +3,7 @@
     package="com.example.niranjansa.playmusicbasic">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -16,19 +17,27 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
+
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <service android:name=".MusicService" />
 
         <activity
-            android:name=".FragmentTest"
-            android:label="@string/title_activity_fragment_test"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:name=".TestFrag"
+            android:label="@string/title_activity_test_frag"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".SongControlActivity"
+            android:label="@string/title_activity_song_control"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

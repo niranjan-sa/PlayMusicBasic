@@ -1,11 +1,15 @@
 package com.example.niranjansa.playmusicbasic;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,8 +45,9 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     private Intent playIntent;
     private boolean musicBound=false;
     private MusicController controller;
+    public static MusicService.MusicBinder bindo;
 
-
+    public static final String SERVICE_REF="service";
     //
     private boolean paused=false, playbackPaused=false;
 
@@ -52,6 +57,22 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         setContentView(R.layout.activity_main);
         //hiiii
         //Here I go
+
+
+        /*
+        * Getting the permissions
+        * */
+
+        // Assume thisActivity is the current activity
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+        int MY_PERMISSIONS_REQUEST_READ_CONTACTS=0;
+        if(permissionCheck== PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WAKE_LOCK},
+                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+        }
+        //Getting the runtime permissions over!!
 
         songView = (ListView)findViewById(R.id.song_list);
         songList = new ArrayList<Song>();
@@ -69,8 +90,6 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         SongAdapter songAdt = new SongAdapter(this, songList);
         songView.setAdapter(songAdt);
         setController();
-
-
     }
 
     @Override
@@ -102,13 +121,15 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     }
 
     public void songPicked(View view){
-
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();
         if(playbackPaused){
             setController();
             playbackPaused=false;
         }
+        Intent intent=new Intent(this, SongControlActivity.class);
+        intent.putExtra(SERVICE_REF, playIntent);
+        startActivity(intent);
         controller.show(0);
         /*musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         musicSrv.playSong();*/
@@ -153,6 +174,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             MusicService.MusicBinder binder = (MusicService.MusicBinder)service;
+            bindo=(MusicService.MusicBinder)service;
             //get service
             musicSrv = binder.getService();
             //pass list
@@ -308,7 +330,7 @@ public class MainActivity extends Activity implements MediaPlayerControl {
     @Override
     public int getCurrentPosition() {
         if(musicSrv!=null && musicBound && musicSrv.isPng())
-        return musicSrv.getPosn();
+        return (int)musicSrv.getPosn();
         else return 0;
     }
 
